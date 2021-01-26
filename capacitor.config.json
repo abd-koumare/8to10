@@ -1,0 +1,13 @@
+{
+  "appId": "com.outbox.8to10",
+  "appName": "8to10",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "dist",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "cordova": {}
+}
