@@ -29,12 +29,12 @@
           <span> - {{
             progressionStatus
               ? progressionStatus
-              : "En attente pour commencer"
+              : "Appuyer pour commencer"
           }} - </span>
         </div>
 
         <div class="OB-numberOfContacts">
-          <span>{{ numberOfContacts }} Contacts</span>
+          <span>{{ numberOfContacts }} numéro(s) de téléphone</span>
         </div>
 
         <div class="OB-btn" >
@@ -101,7 +101,7 @@ export default {
     async updateAllContact() {
       this.resetProgression();
       document.querySelector('.progressionEvolution-shadow').classList.add('progressAnnimate');
-      this.progressionStatus = "Creation of restoration point...";
+      this.progressionStatus = "Création d'un point de restauration ...";
       
       
       let contactsHasBeenSaved = false;
@@ -110,27 +110,27 @@ export default {
       });
 
       if (contactsHasBeenSaved) {
-        this.fakeProgressionStatusValue(30, "Restoration point created!");
+        this.fakeProgressionStatusValue(30, "Point de restauration a été créé avec succès.");
         let contactsHasBeenUpdated = false;
         await ContactsCustomPlugin.updateUserContacts().then((result) => {
-          this.progressionStatus = "Updating contacts...";
+          this.progressionStatus = "Mis à jour des numéros de téléphone en cours ...";
           contactsHasBeenUpdated = result["updated"];
         });
 
         if (contactsHasBeenUpdated) {
           this.fakeProgressionStatusValue(
             100,
-            "Contacts has been updated successfully!"
+            "Les numéros de téléphone ont été mis à jour avec succès."
           );
           document.querySelector('.progressionEvolution-shadow').classList.remove('progressAnnimate');
-          this.Actionstoast("Contacts has been updated successfully!", 'success')
+          this.Actionstoast("Les numéros de téléphone ont été mis à jour avec succès.", 'success')
         } else {
-          this.progressionStatus = "Contacts Update failed !";
-          this.Actionstoast("Contacts Update failed !", 'error')
+          this.progressionStatus = "Échec de la mis à jour des numéros de téléphone.";
+          this.Actionstoast("Échec de la mis à jour des numéros de téléphone.", 'error')
         }
       } else {
-        this.progressionStatus = "Restoration point failed!";
-        this.Actionstoast("Restoration point failed!", 'error')
+        this.progressionStatus = "Échec de la création du point de restauration.";
+        this.Actionstoast("Échec de la création du point de restauration.", 'error')
       }
     },
 
@@ -161,16 +161,16 @@ export default {
         if (result["opened"]) {
           ContactsCustomPlugin.deleteUserContacts().then((result) => {
             if (result["deleted"]) {
-              // console.log("all contacts has been deleted");
-              this.Actionstoast("all contacts has been deleted", 'success')
+
+              this.Actionstoast("Les numéros de téléphone ont été supprimés. ", 'success')
             } else {
-              // console.log("deletion failed");
-              this.Actionstoast("deletion failed", 'error')
+
+              this.Actionstoast("Échec de la suppression des numéros de téléphone.", 'error')
             }
           });
         } else {
-          // console.log("has not been opened");
-          this.Actionstoast("has not been opened", 'error')
+
+          this.Actionstoast("Une erreur a été rencontrée lors de la restauration, vous pouvez restaurer manuellement en vous rendant dans le dossier 8to10Backup/", 'error')
         }
       });
     },
@@ -180,11 +180,11 @@ export default {
       const alert = await alertController
         .create({
           cssClass: 'my-custom-class',
-          header: 'Restoration',
-          message: 'Cette action effacera tous vos contacts',
+          header: 'Restauration',
+          message: 'Cette action effacera tous vos numéros de téléphone.',
           buttons: [
             {
-              text: 'Cancel',
+              text: 'Annuler',
               role: 'cancel',
               cssClass: 'secondary',
               handler: blah => {
@@ -192,7 +192,7 @@ export default {
               },
             },
             {
-              text: 'Okay',
+              text: 'Confirmer',
               handler: () => {
                 this.restoreAllContact();
               },
@@ -208,8 +208,8 @@ export default {
         .create({
           cssClass: 'my-custom-class',
           header: 'Sauvegarde',
-          message: "Auccun point de restauration n'a ete trouver !" ,
-          buttons: ['OK'],
+          message: "Aucun point de restauration a été trouvé !" ,
+          buttons: ['Fermer'],
         });
       return alert.present();
     },

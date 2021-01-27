@@ -21,7 +21,7 @@
           <span
             >Après avoir vu l'annonce qui dictait les nouvelles consigne de
             numérotation ainsi que la mise en garde de l'ARTCI suivant laquelle
-            nous développeurs d'applications devront respecter les dispositions
+            nous développeurs d'applications devrions respecter les dispositions
             légales relatives à la protection des données à caractère personnel
             ainsi que les principes du nouveau plan de numérotation à dix (10)
             chiffres.
@@ -35,12 +35,15 @@
             >En effet, avec 8to10 plus besoin de vous soucier du passage de vos
             numéros de téléphone de huit à dix chiffres, en un seul clique et de
             manière instantanée, tous vos contacts passent à dix chiffres.
+            Un point de restauration est également créé lors du passage de vos
+            numéros de 8 à 10 chiffres de sorte à ce que vous puissiez revenir
+            à la version précédente (celle à 8 chiffres) en cas d'insatisfaction directement via l'application et également depuis le dossier 8to10Backup/ sur votre téléphone mobile.
           </span>
         </div>
 
         <div class="About-option">
           <span class="About-option-heading"> Offrez-nous un café </span>
-          <span>https://www.buymeacoffee/8to10.com</span>
+          <a>https://www.buymeacoffee/8to10.com</a>
           <span>57357748 (OM) - 65119921 (MOMO )</span>
         </div>
 
@@ -52,7 +55,7 @@
         <div class="About-infos">
           <span> Gratuit </span>
           <span> Version 1.0.11 </span>
-          <span> Proposer par Out-Box </span>
+          <span> Proposée par OutBox </span>
         </div>
       </div>
     </ion-content>
