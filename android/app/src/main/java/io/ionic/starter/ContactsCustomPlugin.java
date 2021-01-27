@@ -77,10 +77,8 @@ public class ContactsCustomPlugin extends Plugin {
         JSObject ret = new JSObject();
 
         for (Map.Entry<String, List<String>> mapEntry : mContacts.entrySet()){
-
-            String contactId = mapEntry.getKey();
             for(String phoneNumber : mapEntry.getValue()) {
-                boolean updated = updatePhoneNumberFromContacts(this.getContext().getContentResolver(), contactId, phoneNumber,  convertToTenFormat(phoneNumber));
+                boolean updated = updatePhoneNumberFromContacts(this.getContext().getContentResolver(), phoneNumber,  convertToTenFormat(phoneNumber));
                 if(!updated) {
                     ret.put("updated", updated);
                     break;
@@ -190,34 +188,36 @@ public class ContactsCustomPlugin extends Plugin {
                 this.getActivity().startActivity(intent);
                 return true;
             }
+            return false;
         }
         return false;
     }
 
     private boolean deleteUserContacts(ContentResolver contentResolver) {
-        Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null,  null, null);
-        while (cursor.moveToNext()) {
-            String lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
-            Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey);
-            contentResolver.delete(uri, null, null);
-        }
 
-        cursor.close();
-       return true;
+        if(restorationPointHasBeenCreated()) {
+            Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null,  null, null);
+            while (cursor.moveToNext()) {
+                String lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
+                Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey);
+                contentResolver.delete(uri, null, null);
+            }
+
+            cursor.close();
+            return true;
+        }
+        return false;
     }
 
-    private boolean updatePhoneNumberFromContacts(ContentResolver contentResolver, String contactId, String oldPhoneNumber, String newPhoneNumber)
-    {
+    private boolean updatePhoneNumberFromContacts(ContentResolver contentResolver, String oldPhoneNumber, String newPhoneNumber) {
         boolean hasBeenUpdated = false;
-        //change selection for number
         String where = String.format(
                 "%s = '%s' AND %s = ?",
                 ContactsContract.Data.MIMETYPE,
                 ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
                 ContactsContract.CommonDataKinds.Phone.NUMBER);
 
-        String[] args = {contactId};
-        args[0] = oldPhoneNumber;
+        String[] args = {oldPhoneNumber};
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
         operations.add(
