@@ -9,7 +9,7 @@
         </div>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true">
+    <ion-content  :fullscreen="true">
       <div class="About">
         <div class="About-text">
           <span

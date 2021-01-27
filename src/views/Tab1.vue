@@ -13,12 +13,12 @@
         </div>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true">
+    <ion-content  :fullscreen="true">
       <div class="OB-Container">
         
 
         <div class="OB-progressionEvolution">
-          <div class="progressionEvolution-shadow">
+          <div class="progressionEvolution-shadow ">
             <div class="progressionEvolution-ligth">
               <span>{{ progressionStatusValue }}%</span>
             </div>
@@ -38,10 +38,13 @@
         </div>
 
         <div class="OB-btn" >
-          <div v-on:click="updateAllContact" class="OB-btn-Coversion">
+          <ion-button size="large">
+            <div v-on:click="updateAllContact" class="OB-btn-Coversion">
             <img src="/assets/icon/rocket-outline.svg" alt="" />
             <span> Convertir </span>
           </div>
+          </ion-button>
+          
         </div>
       </div>
 
@@ -51,7 +54,7 @@
 </template>
 
 <script>
-import { IonPage, IonHeader, IonToolbar, IonContent, alertController } from "@ionic/vue";
+import { IonPage, IonHeader, IonToolbar, IonContent, IonButton, alertController, toastController } from "@ionic/vue";
 import { Plugins } from "@capacitor/core";
 import { refreshCircle } from "ionicons/icons";
 
@@ -59,7 +62,7 @@ const { ContactsCustomPlugin } = Plugins;
 
 export default {
   name: "Conversion",
-  components: { IonHeader, IonToolbar, IonContent, IonPage },
+  components: { IonHeader, IonToolbar, IonContent, IonButton, IonPage },
 
   data() {
     return {
@@ -97,8 +100,10 @@ export default {
 
     async updateAllContact() {
       this.resetProgression();
+      document.querySelector('.progressionEvolution-shadow').classList.add('progressAnnimate');
       this.progressionStatus = "Creation of restoration point...";
-
+      
+      
       let contactsHasBeenSaved = false;
       await ContactsCustomPlugin.saveUserContactsAsVcf().then((result) => {
         contactsHasBeenSaved = result["saved"];
@@ -117,11 +122,15 @@ export default {
             100,
             "Contacts has been updated successfully!"
           );
+          document.querySelector('.progressionEvolution-shadow').classList.remove('progressAnnimate');
+          this.Actionstoast("Contacts has been updated successfully!", 'success')
         } else {
           this.progressionStatus = "Contacts Update failed !";
+          this.Actionstoast("Contacts Update failed !", 'error')
         }
       } else {
         this.progressionStatus = "Restoration point failed!";
+        this.Actionstoast("Restoration point failed!", 'error')
       }
     },
 
@@ -152,13 +161,16 @@ export default {
         if (result["opened"]) {
           ContactsCustomPlugin.deleteUserContacts().then((result) => {
             if (result["deleted"]) {
-              console.log("all contacts has been deleted");
+              // console.log("all contacts has been deleted");
+              this.Actionstoast("all contacts has been deleted", 'success')
             } else {
-              console.log("deletion failed");
+              // console.log("deletion failed");
+              this.Actionstoast("deletion failed", 'error')
             }
           });
         } else {
-          console.log("has not been opened");
+          // console.log("has not been opened");
+          this.Actionstoast("has not been opened", 'error')
         }
       });
     },
@@ -202,6 +214,17 @@ export default {
       return alert.present();
     },
 
+
+    async Actionstoast(message, options) {
+      const toast = await toastController
+        .create({
+          message: message,
+          duration: 2000,
+          cssClass: `toast-${options}`
+        })
+      return toast.present();
+    },
+
     
   },
 };
@@ -209,17 +232,33 @@ export default {
 
 <style >
 
+.toast-success{
+  --background: #71C9CE !important;
+}
+.toast-error{
+  --background: #D84685 !important;
+}
+
 @font-face {
 	font-family: 'Maven Pro';
 	src: url('/assets/MavenPro-Medium.ttf'), url('/assets/MavenPro-Regular.ttf');
 }
-.btn-wrapper {
-  margin: 8px 25px;
-  text-align: center; /* center inline and inline-block element inside */
-}
+
 
 *{
   font-family: 'Maven Pro' !important;
+}
+
+.progressAnnimate{
+  width: 10em !important;
+  height: 10em !important;
+  background-color:#b9e6e9 !important;
+  animation: mymove 4s infinite;
+  clip-path: circle(50%);
+}
+
+@keyframes mymove {
+  50% {clip-path: circle(35%);}
 }
 
 .OB-toolbar {
@@ -232,7 +271,7 @@ export default {
 }
 
 .OB-toolbar .OB-toolbar-img {
-  height: 24px;
+  height: 32px;
 }
 
 .OB-toolbar-img-restore {
@@ -274,7 +313,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #c1d9ff !important;
+  background-color:#b9e6e9 !important;
   border-radius: 100%;
   width: 8em;
   height: 8em;
@@ -284,7 +323,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #3880ff !important;
+  background-color:#71c9ce !important;
   border-radius: 100%;
   width: 6.5em;
   height: 6.5em;
@@ -298,10 +337,10 @@ export default {
 
 .OB-progressionStatus {
   font-size: 16px !important;
-  color: #D84685 !important;
+  color: #71c9ce !important;
   font-weight: 600;
   margin: 24px 0px 32px 0px;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 .OB-Container .OB-btn .OB-btn-Coversion {
@@ -310,7 +349,7 @@ export default {
   align-items: center;
   padding: 16px;
   column-gap: 8px;
-  background-color: #3880ff !important;
+  background-color:#ffb74d !important;
   border-radius: 4px;
 }
 
@@ -329,9 +368,20 @@ export default {
 
 
 @media screen and (min-height: 730px) and (max-height: 2000px) {
+
+.progressAnnimate{
+  width: 12em !important;
+  height: 12em !important;
+  background-color:#b9e6e9 !important;
+  animation: mymove 4s infinite;
+  clip-path: circle(50%);
+}
+@keyframes mymove {
+  50% {clip-path: circle(40%);}
+}
 .progressionEvolution-shadow {
-  width: 10em !important;
-  height: 10em !important;
+  width: 11em ;
+  height: 11em ;
 }
   .progressionEvolution-ligth {
   width: 8.5em !important;

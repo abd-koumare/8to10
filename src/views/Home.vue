@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <ion-content class="Content-Home" :fullscreen="true">
+    <ion-content  class="Content-Home" :fullscreen="true">
       <div class="Home">
         <div class="Home-logo">
           <img src="/assets/icon/Logo-8to10.svg" alt="" />
@@ -28,11 +28,11 @@
             <div class="Button-Actived">
               <a
                 @click.prevent="FormConvert"
-                style="background-color: #C1D9FF;"
+                style="background-color: #b9e6e9;"
                 class="Button-area-shadow Button-area-shadow-Home"
               >
                 <div
-                  style="background-color:#3880ff;  "
+                  style="background-color:#71c9ce;  "
                   class="Button-area-ligth Button-area-ligth-Home"
                 >
                   <img src="/assets/icon/Icon-arrow-right.svg" alt="" />
@@ -105,15 +105,15 @@ export default {
 
     position: relative;
     line-height: 1.2em;
-    color: #3880ff !important;
+    color:  #ffb74d  !important;
   }
-
+  /*#3880ff*/
   .Home-localization {
     font-family: "Jost";
     font-weight: 600;
     font-size: 1.1em;
     margin: 8px 0px 16px 0px;
-    color: #d84685 !important;
+    color: #71c9ce !important;
   }
 
   .Home-subtitle {
