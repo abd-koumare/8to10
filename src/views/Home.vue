@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-content  class="Content-Home" :fullscreen="true">
-      <div class="Home">
+      <div class="Home swiper">
         <div class="Home-logo">
           <img src="/assets/icon/Logo-8to10.svg" alt="" />
         </div>
@@ -185,5 +185,17 @@ export default {
     color: #182b3a !important;
     opacity: 0.8;
   }
+}
+
+.swiper{
+  animation: swiperAnnimate 0.5s normal;
+  position: relative;
+  top: 0px;
+  opacity: 1;
+}
+
+@keyframes swiperAnnimate {
+  0%{opacity: 0; top: 60px;}
+  100% {opacity: 1; top: 0px;}
 }
 </style>

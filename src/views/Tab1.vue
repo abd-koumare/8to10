@@ -8,15 +8,16 @@
             <img class="" src="/assets/icon/refresh-circle.svg" />
           </div>
           <div v-else v-on:click="NotRestorationPointExists" class="OB-toolbar-img-restore">
-            <img class="" src="/assets/icon/refresh-circle.svg" />
+            <img class="RestoreClass" src="/assets/icon/refresh-circle.svg" />
+            <span>Renitialiser(8)</span>
           </div>
         </div>
       </ion-toolbar>
     </ion-header>
     <ion-content  :fullscreen="true">
-      <div class="OB-Container">
+      <div class="OB-Container swiper">
         
-
+        
         <div class="OB-progressionEvolution">
           <div class="progressionEvolution-shadow ">
             <div class="progressionEvolution-ligth">
@@ -26,11 +27,11 @@
         </div>
 
         <div class="OB-progressionStatus">
-          <span> - {{
+          <span>{{
             progressionStatus
               ? progressionStatus
               : "Appuyer pour commencer"
-          }} - </span>
+          }} </span>
         </div>
 
         <div class="OB-numberOfContacts">
@@ -38,7 +39,7 @@
         </div>
 
         <div class="OB-btn" >
-          <ion-button size="large">
+          <ion-button class="annimateButton ShowButtonAnnimate" v-if="updateAllContact__start == false" size="large">
             <div v-on:click="updateAllContact" class="OB-btn-Coversion">
             <img src="/assets/icon/rocket-outline.svg" alt="" />
             <span> Convertir </span>
@@ -77,12 +78,17 @@ export default {
       progressionHandler: null,
 
       restorationPointExists: false,
+
+      updateAllContact__start: false,
     };
   },
 
   mounted() {
     this.countPhoneNumbers();
     this.checkIfRestorationPointExists();
+  },
+
+  computed:{
   },
 
   methods: {
@@ -100,6 +106,14 @@ export default {
 
     async updateAllContact() {
       this.resetProgression();
+      
+      document.querySelector('.annimateButton').classList.remove('ShowButtonAnnimate');
+      document.querySelector('.annimateButton').classList.add('HideButtonAnnimate');
+      setTimeout(() => {
+        this.updateAllContact__start = true;
+      }, 530)
+        
+
       document.querySelector('.progressionEvolution-shadow').classList.add('progressAnnimate');
       this.progressionStatus = "Création d'un point de restauration ...";
       
@@ -122,6 +136,7 @@ export default {
             100,
             "Les numéros de téléphone ont été mis à jour avec succès."
           );
+          this.updateAllContact__start = false;
           document.querySelector('.progressionEvolution-shadow').classList.remove('progressAnnimate');
           this.Actionstoast("Les numéros de téléphone ont été mis à jour avec succès.", 'success')
         } else {
@@ -204,14 +219,20 @@ export default {
 
 
     async NotRestorationPointExists() {
-      const alert = await alertController
+
+      document.querySelector('.RestoreClass').classList.add('_EventClass-rotate');
+
+      setTimeout( async() => {
+        const alert = await alertController
         .create({
           cssClass: 'my-custom-class',
           header: 'Sauvegarde',
           message: "Aucun point de restauration a été trouvé !" ,
           buttons: ['Fermer'],
         });
+        document.querySelector('.RestoreClass').classList.remove('_EventClass-rotate');
       return alert.present();
+      }, 500)
     },
 
 
@@ -261,6 +282,59 @@ export default {
   50% {clip-path: circle(35%);}
 }
 
+.ShowButtonAnnimate{
+  background-color:#b9e6e9 !important;
+  animation: ShowButton 0.5s normal;
+  opacity: 1;
+}
+
+@keyframes ShowButton {
+  0%{opacity: 0;}
+  50% {opacity: 0.5;}
+  75% {opacity: 0.7;}
+  100% {opacity: 1;}
+}
+
+.HideButtonAnnimate{
+  background-color:#b9e6e9 !important;
+  animation: HideButton 0.5s normal;
+  opacity: 0;
+}
+@keyframes HideButton {
+  0%{opacity: 1;}
+  50%{opacity: 0.5;}
+  100% {opacity: 0;}
+}
+
+.swiper{
+  animation: swiperAnnimate 0.5s normal;
+  position: relative;
+  top: 0px;
+  opacity: 1;
+}
+
+@keyframes swiperAnnimate {
+  0%{opacity: 0; top: 60px;}
+  100% {opacity: 1; top: 0px;}
+}
+._EventClass-rotate{
+  transform: rotate(0deg) ;
+  animation: rotateAnnimate 0.5s normal;
+}
+@keyframes rotateAnnimate {
+  0%{transform: rotate(180deg) ;}
+  100% {opacity: 1; top: 0px;}
+}
+
+
+
+
+
+
+
+
+
+
 .OB-toolbar {
   width: 100%;
   height: 56px !important;
@@ -278,10 +352,17 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  column-gap: 4px;
 }
 
 .OB-toolbar-img-restore img {
-  height: 32px;
+  height: 24px;
+}
+
+.OB-toolbar-img-restore span {
+  font-size: 16px !important;
+  color: #182b3a !important;
+  font-weight: 500;
 }
 
 .OB-Container {
@@ -294,6 +375,8 @@ export default {
   padding: 0px 32px;
 }
 
+
+
 .OB-Container .OB-numberOfContacts {
   margin: 0px 0px 16px 0px;
 }
@@ -301,7 +384,6 @@ export default {
 .OB-Container .OB-numberOfContacts span {
   font-size: 18px !important;
   color: #182b3a !important;
-  height: 24px !important;
   font-weight: 400;
 }
 
@@ -341,6 +423,7 @@ export default {
   font-weight: 600;
   margin: 24px 0px 32px 0px;
   opacity: 0.9;
+  text-align: center !important;
 }
 
 .OB-Container .OB-btn .OB-btn-Coversion {

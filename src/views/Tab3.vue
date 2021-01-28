@@ -10,7 +10,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content  :fullscreen="true">
-      <div class="About">
+      <div class="About swiper">
         <div class="About-text">
           <span
             >Nous sommes deux développeurs passionnés et friands de défis qui
@@ -72,6 +72,20 @@ export default {
 </script>
 
 <style >
+
+.swiper{
+  animation: swiperAnnimate 0.5s normal;
+  position: relative;
+  top: 0px;
+  opacity: 1;
+}
+
+@keyframes swiperAnnimate {
+  0%{opacity: 0; top: 60px;}
+  100% {opacity: 1; top: 0px;}
+}
+
+
 .OB-toolbar {
   width: 100%;
   height: 56px !important;
