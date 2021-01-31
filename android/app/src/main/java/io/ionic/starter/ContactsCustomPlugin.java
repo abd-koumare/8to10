@@ -77,6 +77,8 @@ public class ContactsCustomPlugin extends Plugin {
         JSObject ret = new JSObject();
 
         for (Map.Entry<String, List<String>> mapEntry : mContacts.entrySet()){
+
+            String contactId = mapEntry.getKey();
             for(String phoneNumber : mapEntry.getValue()) {
                 boolean updated = updatePhoneNumberFromContacts(this.getContext().getContentResolver(), phoneNumber,  convertToTenFormat(phoneNumber));
                 if(!updated) {
@@ -87,6 +89,27 @@ public class ContactsCustomPlugin extends Plugin {
             }
         }
         ret.put("updated", true);
+
+        call.success(ret);
+    }
+
+
+    @PluginMethod
+    public void undoUpdateUserContacts(PluginCall call) {
+        this.loadContacts(this.getContext().getContentResolver());
+
+        JSObject ret = new JSObject();
+
+        for (Map.Entry<String, List<String>> mapEntry : mContacts.entrySet()){
+            for(String phoneNumber : mapEntry.getValue()) {
+                boolean restored = updatePhoneNumberFromContacts(this.getContext().getContentResolver(), phoneNumber,  convertToEightFormat(phoneNumber));
+                if(!restored) {
+                    ret.put("restored", restored);
+                    break;
+                }
+            }
+        }
+        ret.put("restored", true);
 
         call.success(ret);
     }
@@ -188,29 +211,26 @@ public class ContactsCustomPlugin extends Plugin {
                 this.getActivity().startActivity(intent);
                 return true;
             }
-            return false;
         }
         return false;
     }
 
     private boolean deleteUserContacts(ContentResolver contentResolver) {
-
-        if(restorationPointHasBeenCreated()) {
-            Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null,  null, null);
-            while (cursor.moveToNext()) {
-                String lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
-                Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey);
-                contentResolver.delete(uri, null, null);
-            }
-
-            cursor.close();
-            return true;
+        Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null,  null, null);
+        while (cursor.moveToNext()) {
+            String lookupKey = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY));
+            Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey);
+            contentResolver.delete(uri, null, null);
         }
-        return false;
+
+        cursor.close();
+       return true;
     }
 
-    private boolean updatePhoneNumberFromContacts(ContentResolver contentResolver, String oldPhoneNumber, String newPhoneNumber) {
+    private boolean updatePhoneNumberFromContacts(ContentResolver contentResolver, String oldPhoneNumber, String newPhoneNumber)
+    {
         boolean hasBeenUpdated = false;
+        //change selection for number
         String where = String.format(
                 "%s = '%s' AND %s = ?",
                 ContactsContract.Data.MIMETYPE,
@@ -332,5 +352,27 @@ public class ContactsCustomPlugin extends Plugin {
 
     private boolean restorationPointHasBeenCreated() {
         return new File(getVcfFileBackupPath()).exists();
+    }
+
+
+
+    public String undoUpdatePhoneNumber(String phoneNumber) {
+        return phoneNumber.substring(2);
+    }
+
+
+    public String convertToEightFormat(String oldPhoneNumber) {
+        final String INTERNATIONALIZATION_00225 =  "00225";
+        final String INTERNATIONALIZATION_PLUS_225 =  "+225";
+
+        oldPhoneNumber = oldPhoneNumber.replaceAll("\\s+","");
+
+        if(oldPhoneNumber.length() == 15 && oldPhoneNumber.startsWith(INTERNATIONALIZATION_00225))
+            return INTERNATIONALIZATION_00225 + this.undoUpdatePhoneNumber(oldPhoneNumber.substring(5));
+        else if(oldPhoneNumber.length() == 14 && oldPhoneNumber.startsWith(INTERNATIONALIZATION_PLUS_225))
+            return INTERNATIONALIZATION_PLUS_225 + this.undoUpdatePhoneNumber(oldPhoneNumber.substring(4));
+        else if(oldPhoneNumber.length() == 10)
+            return undoUpdatePhoneNumber(oldPhoneNumber);
+        return oldPhoneNumber;
     }
 }

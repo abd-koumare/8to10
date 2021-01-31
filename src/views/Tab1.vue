@@ -9,7 +9,7 @@
           </div>
           <div v-else v-on:click="NotRestorationPointExists" class="OB-toolbar-img-restore">
             <img class="RestoreClass" src="/assets/icon/refresh-circle.svg" />
-            <span>Renitialiser(8)</span>
+            <ion-label> Huits Chiffres </ion-label>
           </div>
         </div>
       </ion-toolbar>
@@ -138,8 +138,8 @@ export default {
           );
           this.updateAllContact__start = false;
           document.querySelector('.progressionEvolution-shadow').classList.remove('progressAnnimate');
-          this.Actionstoast("Les numéros de téléphone ont été mis à jour avec succès.", 'success')
         } else {
+          document.querySelector('.annimateButton').classList.remove('ShowButtonAnnimate');
           this.progressionStatus = "Échec de la mis à jour des numéros de téléphone.";
           this.Actionstoast("Échec de la mis à jour des numéros de téléphone.", 'error')
         }
@@ -176,8 +176,6 @@ export default {
         if (result["opened"]) {
           ContactsCustomPlugin.deleteUserContacts().then((result) => {
             if (result["deleted"]) {
-
-              this.Actionstoast("Les numéros de téléphone ont été supprimés. ", 'success')
             } else {
 
               this.Actionstoast("Échec de la suppression des numéros de téléphone.", 'error')
@@ -196,7 +194,7 @@ export default {
         .create({
           cssClass: 'my-custom-class',
           header: 'Restauration',
-          message: 'Cette action effacera tous vos numéros de téléphone.',
+          message: 'Cette action effacera tous vos numéros de téléphone. En attente de la sauvegarde de vos donner !',
           buttons: [
             {
               text: 'Annuler',
