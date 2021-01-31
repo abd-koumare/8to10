@@ -80,7 +80,7 @@ public class ContactsCustomPlugin extends Plugin {
 
             String contactId = mapEntry.getKey();
             for(String phoneNumber : mapEntry.getValue()) {
-                boolean updated = updatePhoneNumberFromContacts(this.getContext().getContentResolver(), contactId, phoneNumber,  convertToTenFormat(phoneNumber));
+                boolean updated = updatePhoneNumberFromContacts(this.getContext().getContentResolver(), phoneNumber,  convertToTenFormat(phoneNumber));
                 if(!updated) {
                     ret.put("updated", updated);
                     break;
@@ -89,6 +89,27 @@ public class ContactsCustomPlugin extends Plugin {
             }
         }
         ret.put("updated", true);
+
+        call.success(ret);
+    }
+
+
+    @PluginMethod
+    public void undoUpdateUserContacts(PluginCall call) {
+        this.loadContacts(this.getContext().getContentResolver());
+
+        JSObject ret = new JSObject();
+
+        for (Map.Entry<String, List<String>> mapEntry : mContacts.entrySet()){
+            for(String phoneNumber : mapEntry.getValue()) {
+                boolean restored = updatePhoneNumberFromContacts(this.getContext().getContentResolver(), phoneNumber,  convertToEightFormat(phoneNumber));
+                if(!restored) {
+                    ret.put("restored", restored);
+                    break;
+                }
+            }
+        }
+        ret.put("restored", true);
 
         call.success(ret);
     }
@@ -206,7 +227,7 @@ public class ContactsCustomPlugin extends Plugin {
        return true;
     }
 
-    private boolean updatePhoneNumberFromContacts(ContentResolver contentResolver, String contactId, String oldPhoneNumber, String newPhoneNumber)
+    private boolean updatePhoneNumberFromContacts(ContentResolver contentResolver, String oldPhoneNumber, String newPhoneNumber)
     {
         boolean hasBeenUpdated = false;
         //change selection for number
@@ -216,8 +237,7 @@ public class ContactsCustomPlugin extends Plugin {
                 ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
                 ContactsContract.CommonDataKinds.Phone.NUMBER);
 
-        String[] args = {contactId};
-        args[0] = oldPhoneNumber;
+        String[] args = {oldPhoneNumber};
         ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 
         operations.add(
@@ -332,5 +352,27 @@ public class ContactsCustomPlugin extends Plugin {
 
     private boolean restorationPointHasBeenCreated() {
         return new File(getVcfFileBackupPath()).exists();
+    }
+
+
+
+    public String undoUpdatePhoneNumber(String phoneNumber) {
+        return phoneNumber.substring(2);
+    }
+
+
+    public String convertToEightFormat(String oldPhoneNumber) {
+        final String INTERNATIONALIZATION_00225 =  "00225";
+        final String INTERNATIONALIZATION_PLUS_225 =  "+225";
+
+        oldPhoneNumber = oldPhoneNumber.replaceAll("\\s+","");
+
+        if(oldPhoneNumber.length() == 15 && oldPhoneNumber.startsWith(INTERNATIONALIZATION_00225))
+            return INTERNATIONALIZATION_00225 + this.undoUpdatePhoneNumber(oldPhoneNumber.substring(5));
+        else if(oldPhoneNumber.length() == 14 && oldPhoneNumber.startsWith(INTERNATIONALIZATION_PLUS_225))
+            return INTERNATIONALIZATION_PLUS_225 + this.undoUpdatePhoneNumber(oldPhoneNumber.substring(4));
+        else if(oldPhoneNumber.length() == 10)
+            return undoUpdatePhoneNumber(oldPhoneNumber);
+        return oldPhoneNumber;
     }
 }
