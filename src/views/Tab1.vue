@@ -134,7 +134,9 @@ export default {
       });
     
       if (contactsHasBeenUpdated) {
+        document.querySelector('.progressionEvolution-shadow').classList.remove('progressAnnimate');
           this.fakeProgressionStatusValue(100, "Les numéros de téléphone ont été parfaitement mis à jour!");
+          this.updateAllContact__start = false;
 
       } else {
           document.querySelector('.progressionEvolution-shadow').classList.remove('progressAnnimate');
