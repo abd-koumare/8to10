@@ -493,11 +493,3 @@ export default {
 
 }
 </style>
-
-/*
-* ionic build
-* npx cap open android | ouvrir android studio
-* npx cap init [appName] [appId] | permet de definir le nom et l'identifiant de l'application
-* npx cap sync to update custom plugins
-* npx cap copy | Synchroniser l'application avec capicitor
-*/
