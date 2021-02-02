@@ -21,7 +21,7 @@
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/vue';
 
 export default  {
-  name: 'Restoration',
+  name: 'tab2',
   components: {IonHeader, IonToolbar, IonTitle, IonContent, IonPage },
 
 }

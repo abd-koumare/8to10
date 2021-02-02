@@ -141,48 +141,9 @@ public class ContactsCustomPlugin extends Plugin {
         call.success(ret);
     }
 
-    private String updatePhoneNumber(String eightFormat) {
-        if(eightFormat.length() != 8)
-            return eightFormat;
 
-        boolean isLandLine = Integer.parseInt(eightFormat.substring(0, 1)) >= 2 && Integer.parseInt(eightFormat.substring(0, 1)) <= 3;
 
-        if(isLandLine) {
-            final int differentiators =  Integer.parseInt(eightFormat.substring(2, 3));
 
-            if(differentiators == 8)
-                return "21" + eightFormat;
-            else if(differentiators == 0)
-                return "25" + eightFormat;
-            else
-                return "27" + eightFormat;
-        } else {
-            final int differentiators =  Integer.parseInt(eightFormat.substring(1, 2));
-
-            if(differentiators >= 0 && differentiators <= 3)
-                return "01" + eightFormat;
-            else if(differentiators >= 4 && differentiators <= 6)
-                return "05" + eightFormat;
-            else {
-                return "07" + eightFormat;
-            }
-        }
-    }
-
-    public String convertToTenFormat(String oldPhoneNumber) {
-        final String INTERNATIONALIZATION_00225 =  "00225";
-        final String INTERNATIONALIZATION_PLUS_225 =  "+225";
-
-        oldPhoneNumber = oldPhoneNumber.replaceAll("\\s+","");
-
-        if(oldPhoneNumber.length() == 13 && oldPhoneNumber.startsWith(INTERNATIONALIZATION_00225))
-            return INTERNATIONALIZATION_00225 + this.updatePhoneNumber(oldPhoneNumber.substring(5));
-        else if(oldPhoneNumber.length() == 12 && oldPhoneNumber.startsWith(INTERNATIONALIZATION_PLUS_225))
-            return INTERNATIONALIZATION_PLUS_225 + this.updatePhoneNumber(oldPhoneNumber.substring(4));
-        else if(oldPhoneNumber.length() == 8)
-            return updatePhoneNumber(oldPhoneNumber);
-        return oldPhoneNumber;
-    }
 
 
 
@@ -355,15 +316,43 @@ public class ContactsCustomPlugin extends Plugin {
     }
 
 
+    private String updatePhoneNumber(String eightFormat) {
+        if(eightFormat.length() != 8)
+            return eightFormat;
 
+        boolean isLandLine = Integer.parseInt(eightFormat.substring(0, 1)) >= 2 && Integer.parseInt(eightFormat.substring(0, 1)) <= 3;
+
+        if(isLandLine) {
+            final int differentiators =  Integer.parseInt(eightFormat.substring(2, 3));
+
+            if(differentiators == 8)
+                return "21" + eightFormat;
+            else if(differentiators == 0)
+                return "25" + eightFormat;
+            else
+                return "27" + eightFormat;
+        } else {
+            final int differentiators =  Integer.parseInt(eightFormat.substring(1, 2));
+
+            if(differentiators >= 0 && differentiators <= 3)
+                return "01" + eightFormat;
+            else if(differentiators >= 4 && differentiators <= 6)
+                return "05" + eightFormat;
+            else {
+                return "07" + eightFormat;
+            }
+        }
+    }
     public String undoUpdatePhoneNumber(String phoneNumber) {
         return phoneNumber.substring(2);
     }
 
 
     public String convertToEightFormat(String oldPhoneNumber) {
+
         final String INTERNATIONALIZATION_00225 =  "00225";
         final String INTERNATIONALIZATION_PLUS_225 =  "+225";
+        final String INTERNATIONALIZATION_225 = "225";
 
         oldPhoneNumber = oldPhoneNumber.replaceAll("\\s+","");
 
@@ -371,8 +360,29 @@ public class ContactsCustomPlugin extends Plugin {
             return INTERNATIONALIZATION_00225 + this.undoUpdatePhoneNumber(oldPhoneNumber.substring(5));
         else if(oldPhoneNumber.length() == 14 && oldPhoneNumber.startsWith(INTERNATIONALIZATION_PLUS_225))
             return INTERNATIONALIZATION_PLUS_225 + this.undoUpdatePhoneNumber(oldPhoneNumber.substring(4));
+        else if(oldPhoneNumber.length() == 13 && oldPhoneNumber.startsWith(INTERNATIONALIZATION_225))
+            return INTERNATIONALIZATION_225 + this.undoUpdatePhoneNumber(oldPhoneNumber.substring(3));
         else if(oldPhoneNumber.length() == 10)
             return undoUpdatePhoneNumber(oldPhoneNumber);
         return oldPhoneNumber;
     }
+
+    public String convertToTenFormat(String oldPhoneNumber) {
+        final String INTERNATIONALIZATION_00225 =  "00225";
+        final String INTERNATIONALIZATION_PLUS_225 =  "+225";
+        final String INTERNATIONALIZATION_225 = "225";
+
+        oldPhoneNumber = oldPhoneNumber.replaceAll("\\s+","");
+
+        if(oldPhoneNumber.length() == 13 && oldPhoneNumber.startsWith(INTERNATIONALIZATION_00225))
+            return INTERNATIONALIZATION_00225 + this.updatePhoneNumber(oldPhoneNumber.substring(5));
+        else if(oldPhoneNumber.length() == 12 && oldPhoneNumber.startsWith(INTERNATIONALIZATION_PLUS_225))
+            return INTERNATIONALIZATION_PLUS_225 + this.updatePhoneNumber(oldPhoneNumber.substring(4));
+        else if(oldPhoneNumber.length() == 11 && oldPhoneNumber.startsWith(INTERNATIONALIZATION_225))
+            return INTERNATIONALIZATION_225 + this.updatePhoneNumber(oldPhoneNumber.substring(3));
+        else if(oldPhoneNumber.length() == 8)
+            return updatePhoneNumber(oldPhoneNumber);
+        return oldPhoneNumber;
+    }
 }
+

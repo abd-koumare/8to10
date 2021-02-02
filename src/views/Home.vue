@@ -1,7 +1,8 @@
 <template>
-  <ion-page>
-    <ion-content  class="Content-Home" :fullscreen="true">
-      <div class="Home swiper">
+  <ion-page class="swiper">
+    <transition name="slide-fade" >
+    <ion-content v-if="show"  class="Content-Home" :fullscreen="true">
+      <div class="Home ">
         <div class="Home-logo">
           <img src="/assets/icon/Logo-8to10.svg" alt="" />
         </div>
@@ -24,7 +25,7 @@
 
         <div class="Button">
           <!-- @click="AppConvertions" -->
-          <div class="StartButtonClass">
+          <div @click="show = !show" class="StartButtonClass">
             <div class="Button-Actived">
               <a
                 @click.prevent="FormConvert"
@@ -43,22 +44,27 @@
         </div>
       </div>
     </ion-content>
+    </transition>
   </ion-page>
 </template>
 
 <script  >
 import { IonPage, IonContent } from "@ionic/vue";
+import { ref } from 'vue';
 
 export default {
   name: "Home",
   components: { IonContent, IonPage },
   setup() {
+    let show =  ref(true)
+
     const FormConvert = () => {
       window.location.href = "/tabs/tab1/";
     };
 
     return {
       FormConvert,
+      show
     };
   },
 
@@ -76,6 +82,21 @@ export default {
 *{
     font-family: 'Maven Pro' !important;
 }
+
+.slide-fade-enter-active {
+  transition: all 0.2s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(60px);
+  opacity: 0;
+}
+
 .Home {
   width: 100%;
   height: 100%;
@@ -187,15 +208,5 @@ export default {
   }
 }
 
-.swiper{
-  animation: swiperAnnimate 0.5s normal;
-  position: relative;
-  top: 0px;
-  opacity: 1;
-}
 
-@keyframes swiperAnnimate {
-  0%{opacity: 0; top: 60px;}
-  100% {opacity: 1; top: 0px;}
-}
 </style>

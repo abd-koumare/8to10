@@ -101,6 +101,24 @@ http://ionicframework.com/docs/theming/ */
     --ion-color-tint: var(--ion-color-flux-tint);
   }
 
+  .D__none{
+    display: none !important;
+  }
+
+
+  .swiper{
+    animation: swiperAnnimate 0.5s normal;
+    position: relative;
+    height: 100%;
+    top: 0px;
+    opacity: 1;
+  }
+  
+  @keyframes swiperAnnimate {
+    0%{opacity: 0; top: 150px;}
+    100% {opacity: 1; top: 0px;}
+  }
+
 
 
 @media (prefers-color-scheme: dark) {

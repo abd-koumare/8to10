@@ -1,5 +1,5 @@
 <template>
-  <ion-page>
+  <ion-page class="swiper">
     <ion-header>
       <ion-toolbar>
         <div class="OB-toolbar">
@@ -10,7 +10,12 @@
       </ion-toolbar>
     </ion-header>
     <ion-content  :fullscreen="true">
-      <div class="About swiper">
+      <div class="About ">
+
+        <div class="About-option">
+          <span class="About-option-heading"> A propos | OutBox </span>
+        </div>
+
         <div class="About-text">
           <span
             >Nous sommes deux développeurs passionnés et friands de défis qui
@@ -35,9 +40,6 @@
             >En effet, avec 8to10 plus besoin de vous soucier du passage de vos
             numéros de téléphone de huit à dix chiffres, en un seul clique et de
             manière instantanée, tous vos contacts passent à dix chiffres.
-            Un point de restauration est également créé lors du passage de vos
-            numéros de 8 à 10 chiffres de sorte à ce que vous puissiez revenir
-            à la version précédente (celle à 8 chiffres) en cas d'insatisfaction directement via l'application et également depuis le dossier 8to10Backup/ sur votre téléphone mobile.
           </span>
         </div>
 
@@ -54,7 +56,7 @@
 
         <div class="About-infos">
           <span> Gratuit </span>
-          <span> Version 1.2.17 </span>
+          <span> Version 1.9.12 </span>
           <span> Proposée par OutBox </span>
         </div>
       </div>
@@ -73,17 +75,7 @@ export default {
 
 <style >
 
-.swiper{
-  animation: swiperAnnimate 0.5s normal;
-  position: relative;
-  top: 0px;
-  opacity: 1;
-}
 
-@keyframes swiperAnnimate {
-  0%{opacity: 0; top: 60px;}
-  100% {opacity: 1; top: 0px;}
-}
 
 
 .OB-toolbar {
@@ -108,7 +100,7 @@ export default {
 .About .About-text {
   display: flex;
   flex-direction: column;
-  row-gap: 8px;
+  row-gap: 16px;
 }
 .About .About-text span {
   position: relative;
@@ -141,10 +133,11 @@ export default {
   flex-direction: column;
   justify-items: center;
   align-items: center;
-  margin: 32px 0px;
+  margin: 48px 0px !important;
 }
 
 .About .About-infos span {
+  padding-bottom: 8px;
   font-size: 14px !important;
   font-weight: 500;
   color: #182b3a;

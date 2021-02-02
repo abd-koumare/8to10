@@ -1,28 +1,27 @@
 <template>
-  <ion-page>
+  <ion-page class="swiper">
     <ion-header>
       <ion-toolbar>
         <div class="OB-toolbar">
-          <div class="">
-            <img class="OB-toolbar-img" src="/assets/icon/Logo-8to10.svg" />
+          <div class="OB-toolbar-main">
+            
+            <img class="OB-toolbar-img" src="/assets/icon/Logo-8to10.svg" alt="logo"/>
+            
+            <!-- <span>8To10</span> -->
           </div>
-          <div v-if="updateAllContact__start == true" class="OB-toolbar-img-restore">
-            <img class="" src="/assets/icon/refresh-circle.svg" />
-            <ion-label> Huits Chiffres </ion-label>
-          </div>
-          <div v-if="updateAllContact__start == false"  v-on:click="RestoreIfRestorationPointExists" class="OB-toolbar-img-restore">
-            <img class="RestoreClass" src="/assets/icon/refresh-circle.svg" />
-            <ion-label> Huits Chiffres </ion-label>
-          </div>
+          <transition name="bounce">
+            <div v-if="!isLoading" v-on:click="RestoreIfRestorationPointExists" class="OB-toolbar-img-restore">
+              <img class="RestoreClass" src="/assets/icon/refresh-circle.svg" alt="refresh icon"/>
+              <ion-label> Huit Chiffres</ion-label>
+            </div>
+          </transition>
         </div>
       </ion-toolbar>
     </ion-header>
-    <ion-content  :fullscreen="true">
-      <div class="OB-Container swiper">
-        
-        
+    <ion-content :fullscreen="true">
+      <div class="OB-Container ">
         <div class="OB-progressionEvolution">
-          <div class="progressionEvolution-shadow ">
+          <div class="progressionEvolution-shadow" v-bind:class="{ 'progressAnnimate': isLoading}">
             <div class="progressionEvolution-ligth">
               <span>{{ progressionStatusValue }}%</span>
             </div>
@@ -30,44 +29,41 @@
         </div>
 
         <div class="OB-progressionStatus">
-          <span>{{
-            progressionStatus
-              ? progressionStatus
-              : "Appuyer pour commencer"
-          }} </span>
+          <span>{{ progressionStatus }} </span>
         </div>
 
         <div class="OB-numberOfContacts">
           <span>{{ numberOfContacts }} numéro(s) de téléphone</span>
         </div>
 
-        <div class="OB-btn" >
-          <ion-button class="annimateButton ShowButtonAnnimate" v-if="updateAllContact__start == false" size="large">
-            <div v-on:click="updateAllContact" class="OB-btn-Coversion">
-            <img src="/assets/icon/rocket-outline.svg" alt="" />
-            <span> Convertir </span>
-          </div>
-          </ion-button>
-
-          <!-- <ion-button class="annimateButton ShowButtonAnnimate" v-if="updateAllContact__start == false" size="large">
-            <div v-on:click="updateAllContact" class="OB-btn-Coversion">
-            <img src="/assets/icon/rocket-outline.svg" alt="" />
-            <span> Convertir </span>
-          </div>
-          </ion-button>
-           -->
+        <div class="OB-btn">
+          <transition name="bounce">
+            <ion-button v-on:click="updateAllContact" class="btn-convert" :disabled="isLoading" v-if="!isLoading">
+              <img src="/assets/icon/rocket-outline.svg" height="18" width="18" alt="rocket"/>
+              <span style="margin-left: 8px;"> Convertir </span>
+            </ion-button>
+          </transition>
         </div>
+
       </div>
 
-  
     </ion-content>
   </ion-page>
 </template>
 
 <script>
-import { IonPage, IonHeader, IonToolbar, IonContent, IonLabel, IonButton, alertController, toastController } from "@ionic/vue";
-import { Plugins } from "@capacitor/core";
-import { refreshCircle } from "ionicons/icons";
+import {
+  IonPage,
+  IonHeader,
+  IonToolbar,
+  IonContent,
+  IonLabel,
+  IonButton,
+  alertController,
+  toastController
+} from "@ionic/vue";
+import {Plugins} from "@capacitor/core";
+import {refreshCircle} from "ionicons/icons";
 
 
 const {ContactsCustomPlugin} = Plugins;
@@ -84,21 +80,18 @@ export default {
 
       numberOfContacts: 0,
 
-      progressionStatus: "",
+      progressionStatus: "Appuyer sur un bouton pour commencer",
       progressionStatusValue: 0,
       progressionCurrentLimit: 0,
       progressionEndMessage: "",
       progressionHandler: null,
 
-      updateAllContact__start: false,
-      // restorationPointExists: null,
-
+      isLoading: false,
     }
   },
 
   mounted() {
     this.countPhoneNumbers();
-    // this.checkIfRestorationPointExists()
   },
 
   methods: {
@@ -108,41 +101,40 @@ export default {
       })
     },
 
-    // checkIfRestorationPointExists() {
-    //   ContactsCustomPlugin.restorationPointExists().then((result) => {
-    //     this.restorationPointExists = result["exists"];
-    //     console.log(this.restorationPointExists);
-    //   });
-    // },
+    IntervalIsLoading(bool){
+      setTimeout(() => {this.isLoading = bool;}, 100);
+      if(bool === false){
+        document.querySelector('.DesableAbout').classList.remove('D__none');
+        document.querySelector('.ActiveAbout').classList.add('D__none')
+      }
+    },
+
 
     async updateAllContact() {
       this.resetProgression();
 
-      document.querySelector('.annimateButton').classList.remove('ShowButtonAnnimate');
-      document.querySelector('.annimateButton').classList.add('HideButtonAnnimate');
-      setTimeout(() => {
-        this.updateAllContact__start = true;
-      }, 530)
-      document.querySelector('.progressionEvolution-shadow').classList.add('progressAnnimate');
+      document.querySelector('.DesableAbout').classList.add('D__none');
+      document.querySelector('.ActiveAbout').classList.remove('D__none')
 
+      this.IntervalIsLoading(true);
       let contactsHasBeenUpdated = false;
-      this.progressionStatus = "Préparation ..."
-      this.fakeProgressionStatusValue(50);
-      await ContactsCustomPlugin.updateUserContacts().then(result => {
-          this.progressionStatus = "Mis à jour des numéros de téléphone en cours ...";
-          contactsHasBeenUpdated = result["updated"];
-      });
-    
-      if (contactsHasBeenUpdated) {
-        document.querySelector('.progressionEvolution-shadow').classList.remove('progressAnnimate');
-          this.fakeProgressionStatusValue(100, "Les numéros de téléphone ont été parfaitement mis à jour!");
-          this.updateAllContact__start = false;
+      this.progressionStatus = "Mise à jour des numéros de téléphone en cours de progression ..."
+      this.fakeProgressionStatusValue(90, "Encore quelques secondes s'il vous plaît  🙏 ");
+      ContactsCustomPlugin.updateUserContacts().then(result => {
+        contactsHasBeenUpdated = result["updated"];
 
-      } else {
-          document.querySelector('.progressionEvolution-shadow').classList.remove('progressAnnimate');
-          this.progressionStatus = "La mise à jour a échoué !";
-          this.Actionstoast("La mise à jour a échoué !", "error");
-      }
+        if (contactsHasBeenUpdated) {
+          this.fakeProgressionStatusValue(100, "Les numéros de téléphone ont été parfaitement mis à jour 😎");
+          this.IntervalIsLoading(false);
+        } else {
+          this.progressionStatus = "La mise à jour a échoué 😔";
+          this.Actionstoast("Échec de la mis à jour, réessayer !", "error");
+          this.IntervalIsLoading(false);
+        }
+
+      });
+
+
     },
 
 
@@ -150,13 +142,13 @@ export default {
       this.progressionStatusValue = 0;
     },
 
-    fakeProgressionStatusValue(limit, message) {
+    async fakeProgressionStatusValue(limit, message) {
       this.progressionCurrentLimit = limit;
       this.progressionEndMessage = message;
-      this.progressionHandler = setInterval(this.incrementProgressionStatusValue, 100);
+      this.progressionHandler = setInterval(this.incrementProgressionStatusValue, 150);
     },
 
-    incrementProgressionStatusValue() {
+    async incrementProgressionStatusValue() {
       if (this.progressionStatusValue < this.progressionCurrentLimit)
         this.progressionStatusValue += 1;
       else {
@@ -169,180 +161,184 @@ export default {
     async restoreAllContact() {
       this.resetProgression();
 
-      document.querySelector('.annimateButton').classList.remove('ShowButtonAnnimate');
-      document.querySelector('.annimateButton').classList.add('HideButtonAnnimate');
-      setTimeout(() => {
-        this.updateAllContact__start = true;
-      }, 530)
-      document.querySelector('.progressionEvolution-shadow').classList.add('progressAnnimate');
+      document.querySelector('.DesableAbout').classList.add('D__none');
+      document.querySelector('.ActiveAbout').classList.remove('D__none')
 
+      this.IntervalIsLoading(true);
       let hasBeenRestored = false;
-      this.fakeProgressionStatusValue(50)
-      this.progressionStatus = "Recherche la sauvegarde...";
-      this.updateAllContact__start = true;
-      await ContactsCustomPlugin.undoUpdateUserContacts().then(result => {
-          this.progressionStatus = "Restauration en cours ...";
-          hasBeenRestored = result["restored"];
+      this.progressionStatus = "Restauration des numéros de téléphone en cours de progression ...";
+      this.fakeProgressionStatusValue(90, "Encore quelques secondes s'il vous plaît 🙏");
+      ContactsCustomPlugin.undoUpdateUserContacts().then(result => {
+        hasBeenRestored = result["restored"];
+
+        if (hasBeenRestored) {
+          this.fakeProgressionStatusValue(100, "Les numéros de téléphone ont été parfaitement restaurés 😎");
+          this.IntervalIsLoading(false);
+        } else {
+          this.progressionStatus = "La restauration a échoué 😔";
+          this.Actionstoast("Échec de la restauration, réessayez !", "error");
+          this.IntervalIsLoading(false);
+        }
       });
 
-      if(hasBeenRestored){
-        this.fakeProgressionStatusValue(100, "Les numéros de téléphone ont été parfaitement mis à jour!");
-        this.updateAllContact__start = false;
-        
-      document.querySelector('.progressionEvolution-shadow').classList.remove('progressAnnimate');
-        this.countPhoneNumbers();
-      }else{
-        this.progressionStatus = "Echec, accune sauvegarde trouver !";
-        this.Actionstoast("La restauration a échoué !", "error");
-      }
-        
 
     },
 
 
     async Actionstoast(message, options) {
       const toast = await toastController
-        .create({
-          message: message,
-          duration: 2000,
-          cssClass: `toast-${options}`
-        })
+          .create({
+            message: message,
+            duration: 2000,
+            cssClass: `toast-${options}`
+          })
       return toast.present();
-    },
-
-
-    async NotRestorationPointExists() {
-
-      document.querySelector('.RestoreClass').classList.add('_EventClass-rotate');
-
-      setTimeout( async() => {
-        const alert = await alertController
-        .create({
-          cssClass: 'my-custom-class',
-          header: 'Sauvegarde',
-          message: "Aucun point de restauration a été trouvé !" ,
-          buttons: ['Fermer'],
-        });
-        document.querySelector('.RestoreClass').classList.remove('_EventClass-rotate');
-      return alert.present();
-      }, 500)
     },
 
 
     async RestoreIfRestorationPointExists() {
       const alert = await alertController
-        .create({
-          cssClass: 'my-custom-class',
-          header: 'Restauration',
-          message: 'Cette action effacera tous vos numéros de téléphone, dans l\'attente de la sauvegarde de votre contacts !',
-          buttons: [
-            {
-              text: 'Annuler',
-              role: 'cancel',
-              cssClass: 'secondary',
-              handler: blah => {
-                console.log('Confirm Cancel:', blah)
+          .create({
+            cssClass: 'my-custom-class',
+            header: 'Restauration',
+            message: 'Cette action ramènera tous vos numéros de téléphone à huit chiffres !',
+            buttons: [
+              {
+                text: 'Annuler',
+                role: 'cancel',
+                cssClass: 'secondary',
+                handler: blah => {
+                  console.log('Confirm Cancel:', blah)
+                },
               },
-            },
-            {
-              text: 'Confirmer',
-              handler: () => {
-                this.restoreAllContact();
+              {
+                text: 'Confirmer',
+                handler: () => {
+                  this.restoreAllContact();
+                },
               },
-            },
-          ],
-        });
+            ],
+          });
       return alert.present();
     },
 
   }
 
-  
+
 }
 </script>
 
-<style >
+<style>
 
-.toast-success{
-  --background: #71C9CE !important;
-}
-.toast-error{
-  --background: #D84685 !important;
-}
 
 @font-face {
-	font-family: 'Maven Pro';
-	src: url('/assets/MavenPro-Medium.ttf'), url('/assets/MavenPro-Regular.ttf');
+  font-family: 'Maven Pro';
+  src: url('/assets/MavenPro-Medium.ttf'), url('/assets/MavenPro-Regular.ttf');
 }
 
 
-*{
-  font-family: 'Maven Pro' !important;
+* {
+  font-family: 'Maven Pro', 'Roboto', sans-serif !important;
 }
 
-.progressAnnimate{
+
+.btn-convert {
+  height: 45px;
+}
+
+
+.bounce-enter-active {
+  animation: bounce-in .5s;
+}
+
+.bounce-leave-active {
+  animation: bounce-in .5s reverse;
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+
+
+
+.progressAnnimate {
   width: 10em !important;
   height: 10em !important;
-  background-color:#b9e6e9 !important;
+  background-color: #b9e6e9 !important;
   animation: mymove 4s infinite;
   clip-path: circle(50%);
 }
 
 @keyframes mymove {
-  50% {clip-path: circle(35%);}
+  50% {
+    clip-path: circle(35%);
+  }
 }
 
-.ShowButtonAnnimate{
-  background-color:#b9e6e9 !important;
+.ShowButtonAnnimate {
+  background-color: #b9e6e9 !important;
   animation: ShowButton 0.5s normal;
   opacity: 1;
 }
 
 @keyframes ShowButton {
-  0%{opacity: 0;}
-  50% {opacity: 0.5;}
-  75% {opacity: 0.7;}
-  100% {opacity: 1;}
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  75% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
-.HideButtonAnnimate{
-  background-color:#b9e6e9 !important;
+.HideButtonAnnimate {
+  background-color: #b9e6e9 !important;
   animation: HideButton 0.5s normal;
   opacity: 0;
 }
+
 @keyframes HideButton {
-  0%{opacity: 1;}
-  50%{opacity: 0.5;}
-  100% {opacity: 0;}
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
-.swiper{
-  animation: swiperAnnimate 0.5s normal;
-  position: relative;
-  top: 0px;
-  opacity: 1;
-}
 
-@keyframes swiperAnnimate {
-  0%{opacity: 0; top: 60px;}
-  100% {opacity: 1; top: 0px;}
-}
-._EventClass-rotate{
-  transform: rotate(0deg) ;
+
+._EventClass-rotate {
+  transform: rotate(0deg);
   animation: rotateAnnimate 0.5s normal;
 }
+
 @keyframes rotateAnnimate {
-  0%{transform: rotate(180deg) ;}
-  100% {opacity: 1; top: 0px;}
+  0% {
+    transform: rotate(180deg);
+  }
+  100% {
+    opacity: 1;
+    top: 0;
+  }
 }
-
-
-
-
-
-
-
-
 
 
 .OB-toolbar {
@@ -351,7 +347,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0px 32px;
+  padding: 0 32px;
 }
 
 .OB-toolbar .OB-toolbar-img {
@@ -375,20 +371,33 @@ export default {
   font-weight: 500;
 }
 
+
+.OB-toolbar-main{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 8px;
+}
+
+.OB-toolbar-main span {
+  font-size: 18px !important;
+  color: #71c9ce !important;
+  font-weight: 700;
+}
+
 .OB-Container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 100%;
-  padding: 0px 32px;
+  height: 90%;
+  padding: 0 32px;
 }
 
 
-
 .OB-Container .OB-numberOfContacts {
-  margin: 0px 0px 16px 0px;
+  margin: 0 0 16px 0;
 }
 
 .OB-Container .OB-numberOfContacts span {
@@ -405,7 +414,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color:#b9e6e9 !important;
+  background-color: #b9e6e9 !important;
   border-radius: 100%;
   width: 8em;
   height: 8em;
@@ -415,7 +424,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color:#71c9ce !important;
+  background-color: #71c9ce !important;
   border-radius: 100%;
   width: 6.5em;
   height: 6.5em;
@@ -430,10 +439,9 @@ export default {
 .OB-progressionStatus {
   font-size: 16px !important;
   color: #71c9ce !important;
-  font-weight: 600;
-  margin: 24px 0px 32px 0px;
-  opacity: 0.9;
+  margin: 32px auto 48px auto;
   text-align: center !important;
+  width: 90%;
 }
 
 .OB-Container .OB-btn .OB-btn-Coversion {
@@ -442,7 +450,7 @@ export default {
   align-items: center;
   padding: 16px;
   column-gap: 8px;
-  background-color:#ffb74d !important;
+  background-color: #ffb74d !important;
   border-radius: 4px;
 }
 
@@ -457,45 +465,46 @@ export default {
 }
 
 
-
-
-
 @media screen and (min-height: 730px) and (max-height: 2000px) {
 
-.progressAnnimate{
-  width: 12em !important;
-  height: 12em !important;
-  background-color:#b9e6e9 !important;
-  animation: mymove 4s infinite;
-  clip-path: circle(50%);
-}
-@keyframes mymove {
-  50% {clip-path: circle(40%);}
-}
-.progressionEvolution-shadow {
-  width: 11em ;
-  height: 11em ;
-}
+  .progressAnnimate {
+    width: 12em !important;
+    height: 12em !important;
+    background-color: #b9e6e9 !important;
+    animation: mymove 4s infinite;
+    clip-path: circle(50%);
+  }
+
+  @keyframes mymove {
+    50% {
+      clip-path: circle(40%);
+    }
+  }
+  .progressionEvolution-shadow {
+    width: 11em;
+    height: 11em;
+  }
+
   .progressionEvolution-ligth {
-  width: 8.5em !important;
-  height: 8.5em !important;
-}
+    width: 8.5em !important;
+    height: 8.5em !important;
+  }
 
-.progressionEvolution-ligth span {
-  font-size: 32px !important;
-}
+  .progressionEvolution-ligth span {
+    font-size: 32px !important;
+  }
 
-.OB-progressionStatus {
-  font-size: 18px !important;
-}
+  .OB-progressionStatus {
+    font-size: 18px !important;
+  }
 
-.OB-Container .OB-numberOfContacts span {
-  font-size: 20px !important;
-}
+  .OB-Container .OB-numberOfContacts span {
+    font-size: 20px !important;
+  }
 
-.OB-Container .OB-btn .OB-btn-Coversion span {
-  font-size: 20px !important;
-}
+  .OB-Container .OB-btn .OB-btn-Coversion span {
+    font-size: 20px !important;
+  }
 
 
 }
